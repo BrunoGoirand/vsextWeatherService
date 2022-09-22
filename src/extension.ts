@@ -1,25 +1,54 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
+import * as vscode from "vscode";
+import { WeatherService } from "./WeatherService";
+
+let weatherStatusBarItem: vscode.StatusBarItem;
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
-	
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "vsextWeatherService" is now active!');
+export async function activate(context: vscode.ExtensionContext) {
+  const weatherService = new WeatherService();
+  console.log("Weather: extension loaded correctly");
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('vsextWeatherService.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from vsextWeatherService!');
-	});
+  // The command has been defined in the package.json file
+  // Now provide the implementation of the command with registerCommand
+  // The commandId parameter must match the command field in package.json
+  let getWeather = vscode.commands.registerCommand("weather.getWeather", () => {
+    // The code you place here will be executed every time your command is executed
+    // Display a message box to the user
+    vscode.window.showInformationMessage("Weather extension by G3Be");
+    vscode.window
+      .showInputBox({ value: "Enter the city to get the weather for..." })
+      .then(async (city) => {
+        console.log(city);
+        const weather = await weatherService.getWeather(city);
+        if (!weatherStatusBarItem) {
+          weatherStatusBarItem = vscode.window.createStatusBarItem(
+            vscode.StatusBarAlignment.Right,
+            100
+          );
+        }
+        weatherStatusBarItem.text =
+          weather.city + " " + weather.temperature + " " + weather.description;
+        weatherStatusBarItem.show();
+      });
+  });
 
-	context.subscriptions.push(disposable);
+  let getWeatherExtended = vscode.commands.registerCommand(
+    "weather.getWeatherExtended",
+    () => {
+      vscode.window.showInformationMessage("Weather extension by G3Be");
+      vscode.window
+        .showInputBox({ value: "Enter the city to get the weather for..." })
+        .then(async (city) => {
+          console.log(city);
+          const extendedWeather = await weatherService.getWeatherExtended(city);
+          vscode.window.showInformationMessage(JSON.stringify(extendedWeather));
+          console.log(extendedWeather);
+        });
+    }
+  );
+
+  context.subscriptions.push(getWeather, getWeatherExtended);
 }
 
 // this method is called when your extension is deactivated
