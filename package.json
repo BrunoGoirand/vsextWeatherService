@@ -1,6 +1,6 @@
 {
   "name": "vsextweatherservice",
-  "displayName": "vsextWeatherService",
+  "displayName": "WeatherService",
   "description": "Weather service extension for Visual Studio Code",
   "version": "0.0.1",
   "engines": {
